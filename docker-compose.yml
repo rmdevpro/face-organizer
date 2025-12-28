@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  deepface-gpu:
+    build: .
+    image: deepface-gpu:latest
+    container_name: deepface-gpu
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    volumes:
+      # Same mounts as faceswap-vnc
+      - /mnt/win_share/faceswap:/workspace
+      - /mnt/win_share/use:/mnt/win_share/use:ro
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
