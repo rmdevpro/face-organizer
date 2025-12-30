@@ -1,10 +1,10 @@
 version: '3.8'
 
 services:
-  deepface-gpu:
+  face-organizer:
     build: .
-    image: deepface-gpu:latest
-    container_name: deepface-gpu
+    image: face-organizer:latest
+    container_name: face-organizer
     runtime: nvidia
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
