@@ -2,6 +2,10 @@
 
 Docker container for GPU-accelerated face organization, clustering, and identification.
 
+> **📋 For complete project planning, architecture, and development workflow, see [PROJECT_PLAN.md](PROJECT_PLAN.md)**
+>
+> **🔧 For GPU acceleration troubleshooting history (9 attempts), see [GPU_TROUBLESHOOTING_LOG.md](GPU_TROUBLESHOOTING_LOG.md)**
+
 ## Purpose
 
 This container is designed for **organizing and sorting large collections of face images by person**. Primary capabilities:
