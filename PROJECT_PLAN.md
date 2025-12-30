@@ -1,7 +1,7 @@
 # Face Organizer - Project Plan
 
-**Last Updated**: 2025-12-30
-**Status**: Initial Development - GPU Acceleration Blocked
+**Last Updated**: 2025-12-30 23:30 UTC
+**Status**: Ready for Testing - Container Cleaned & MAD Storage Adopted
 **Repository**: https://github.com/rmdevpro/face-organizer
 
 ---
@@ -17,11 +17,22 @@ Face Organizer is a GPU-accelerated system for organizing large collections of f
 3. **Face Search**: Find all images of a specific person using similarity search
 4. **Dual-GPU Processing**: Parallel processing across 2x Tesla P4 GPUs
 
-### Current Status
-🔴 **BLOCKED**: GPU acceleration for InsightFace is not working (see Section 7)
+### Current Status (2025-12-30)
+🟢 **READY FOR TESTING**: Container cleaned up and ready for face organization jobs
+- ✅ Adopted MAD development storage pattern (ADR-025)
+- ✅ Replaced DeepFace with minimal InsightFace stack
+- ✅ Reduced container from 11.5GB → 10.1GB (saved 1.4GB)
+- ✅ Reduced packages from 762MB (67 packages) → 555MB (53 packages)
+- ✅ 2x Tesla P4 GPUs detected and working
+- ✅ All dependencies verified (InsightFace 0.7.3, ONNX Runtime 1.23.2, FAISS 1.9.0)
+- ✅ Job directory structure created at `/mnt/irina_storage/dev/files/face-organizer/`
+- ⏳ **NEXT**: Load source images and run first face organization job
+
+🔴 **KNOWN BLOCKER**: GPU acceleration for InsightFace still not working (see Section 7)
 - InsightFace requires ONNX Runtime GPU support
 - All attempts (9 total) to enable GPU on Tesla P4 (Pascal/sm_61) with CUDA 12.3 have failed
 - Current fallback: CPU processing (5-8 img/sec vs target 400-600 img/sec on GPU)
+- **Impact**: ~80 hours to process 500k images on CPU instead of ~42 minutes on GPU
 
 ---
 
@@ -34,14 +45,14 @@ Face Organizer is a GPU-accelerated system for organizing large collections of f
 ├── README.md                        # User-facing documentation
 ├── GPU_TROUBLESHOOTING_LOG.md      # Historical: GPU acceleration debugging (9 attempts)
 ├── Dockerfile                       # Container build instructions
-├── docker-compose.yml               # Service configuration
-├── constraints.txt                  # TensorFlow version locks
+├── docker-compose.yml               # Service configuration (ADR-025 compliant)
+├── requirements.txt                 # Minimal dependencies (InsightFace, FAISS, ONNX Runtime)
 ├── .gitignore                       # Excludes packages/ directory
-├── packages/                        # Local only: 762MB pip wheels (NOT in git)
-└── scripts/                         # Python scripts (version controlled)
+├── packages/                        # Local only: 555MB pip wheels (NOT in git)
+└── scripts/                         # Python scripts (hot-mounted from repo)
     ├── generate_embeddings.py      # Primary: InsightFace embedding generation
     ├── cluster_faces.py            # Primary: FAISS K-Means clustering
-    ├── gender_filter.py            # Legacy: DeepFace gender filtering
+    ├── gender_filter.py            # Legacy: DeepFace gender filtering (not needed)
     └── benchmark_backends.py       # Utility: Performance testing
 ```
 
@@ -79,7 +90,8 @@ Face Organizer is a GPU-accelerated system for organizing large collections of f
    - Troubleshooting notes in GPU_TROUBLESHOOTING_LOG.md if GPU-related
 
 #### What NOT to Commit
-❌ `packages/` directory (762MB pip wheels - local cache only)
+❌ `packages/` directory (555MB pip wheels - local cache only)
+❌ `packages_old_deepface/` directory (archived old packages)
 ❌ Running container state/logs
 ❌ Test images/embeddings
 ❌ Temporary work files
