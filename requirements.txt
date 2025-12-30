@@ -8,6 +8,8 @@ onnxruntime-gpu>=1.19.0     # GPU-accelerated model inference for InsightFace
 # Clustering and numerical operations
 faiss-cpu==1.9.0            # K-Means clustering (CPU fallback, GPU version via conda)
 numpy<2.0                   # Array operations (InsightFace requires <2.0)
+# Note: ml-dtypes auto-installed by ONNX (needs >=0.5 for float4 support)
+# TensorFlow 2.16.1 wants ~=0.3.1 but this causes harmless warning - we don't use TF
 
 # Image processing
 opencv-python>=4.8.0        # Image operations (InsightFace dependency)
