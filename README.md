@@ -77,6 +77,61 @@ Instead of re-downloading 762MB on every rebuild:
 3. **Git**: `packages/` is gitignored (kept local only)
 4. **Result**: Rebuilds take ~2-3 minutes instead of 10-15 minutes
 
+## Data Organization
+
+This container follows the **MAD Development Storage Pattern** (ADR-025) from the Joshua ecosystem:
+
+### Storage Architecture
+
+**Container View** (inside container):
+```
+/mnt/irina_storage/files/face-organizer/
+├── input/                     # Place your source face images here
+│   └── *.jpg, *.png, *.jpeg
+├── output/
+│   ├── embeddings/            # Generated .pkl embedding files
+│   ├── person_A/              # Clustered images for Person A
+│   ├── person_B/              # Clustered images for Person B
+│   └── outliers/              # Low-confidence images (optional)
+└── temp/                      # Temporary processing files
+```
+
+**Host View** (on machine .210):
+- Container path `/mnt/irina_storage/files` maps to host path `/mnt/irina_storage/dev/files`
+- Development environment uses isolated dev storage (not prod/test data)
+
+### Preparing a Face Organization Job
+
+1. **Place source images** in the input directory:
+   ```bash
+   # Copy your 500k face images to:
+   /mnt/irina_storage/dev/files/face-organizer/input/
+   ```
+
+2. **Run the container** (scripts access via hot-mounted code):
+   ```bash
+   docker-compose up -d
+   ```
+
+3. **Process images** (scripts reference `$STORAGE_ROOT` environment variable):
+   ```bash
+   docker exec face-organizer python /mnt/projects/face-organizer/scripts/generate_embeddings.py \
+     --input /mnt/irina_storage/files/face-organizer/input \
+     --output /mnt/irina_storage/files/face-organizer/output/embeddings/embeddings.pkl
+   ```
+
+4. **Find results** in output directory:
+   ```bash
+   ls -lh /mnt/irina_storage/dev/files/face-organizer/output/
+   ```
+
+### Key Principles
+
+- **Scripts are hot-mounted**: Changes to `/mnt/projects/face-organizer/scripts/` are immediately available in the running container (no rebuild needed)
+- **Data stays in dev storage**: All job data isolated to `/mnt/irina_storage/dev/files/` (not shared with test/prod)
+- **12-Factor config**: Scripts use `$STORAGE_ROOT` environment variable, not hardcoded paths
+- **Repository for code only**: `/mnt/projects/face-organizer/` contains code, NOT data
+
 ## Setup & Build
 
 ### Initial Setup (One Time)
@@ -114,8 +169,9 @@ docker run -d \
   --name face-organizer \
   --gpus all \
   --runtime nvidia \
-  -v /mnt/win_share/faceswap:/workspace \
-  -v /mnt/win_share/use:/mnt/win_share/use:ro \
+  -v /mnt/projects/face-organizer:/mnt/projects/face-organizer:ro \
+  -v /mnt/irina_storage/dev/files:/mnt/irina_storage/files:rw \
+  -e STORAGE_ROOT=/mnt/irina_storage/files \
   face-organizer:latest
 ```
 

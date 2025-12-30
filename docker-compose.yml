@@ -9,10 +9,13 @@ services:
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - STORAGE_ROOT=/mnt/irina_storage/files  # 12-factor config pattern (ADR-025)
     volumes:
-      # Same mounts as faceswap-vnc
-      - /mnt/win_share/faceswap:/workspace
-      - /mnt/win_share/use:/mnt/win_share/use:ro
+      # Code mount (read-only hot-mount for dev - ADR-025)
+      - /mnt/projects/face-organizer:/mnt/projects/face-organizer:ro
+
+      # Data mount (dev environment storage - ADR-025)
+      - /mnt/irina_storage/dev/files:/mnt/irina_storage/files:rw
     stdin_open: true
     tty: true
     deploy:

@@ -21,8 +21,10 @@ RUN pip install --upgrade pip && \
     deepface tf-keras && \
     rm -rf /tmp/packages/ /tmp/constraints.txt
 
-# Create workspace and scripts directory
+# Create workspace directory
 WORKDIR /workspace
-COPY scripts/ /app/scripts/
+
+# Scripts are hot-mounted from /mnt/projects/face-organizer/scripts (ADR-025 dev pattern)
+# No COPY needed - changes to scripts in git repo are immediately available
 
 CMD ["/bin/bash"]
