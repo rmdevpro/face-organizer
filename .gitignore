@@ -1,5 +1,7 @@
 # Downloaded packages (keep local, don't push to GitHub)
 packages/
+packages_old_deepface/
+packages_minimal/
 
 # Python cache
 __pycache__/

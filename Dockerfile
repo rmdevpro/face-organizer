@@ -9,17 +9,17 @@ RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy downloaded packages and version constraints
+# Copy downloaded packages
 COPY packages/ /tmp/packages/
-COPY constraints.txt /tmp/constraints.txt
+COPY requirements.txt /tmp/requirements.txt
 
-# Install DeepFace with strict version constraints to prevent breaking TensorFlow GPU support
-# constraints.txt locks ALL base image packages to their exact versions
+# Install minimal dependencies for face organization
+# InsightFace (face embeddings), ONNX Runtime GPU (inference), FAISS (clustering)
+# Use local packages where available, but allow PyPI for build dependencies
 RUN pip install --upgrade pip && \
-    pip install --find-links=/tmp/packages/ --constraint /tmp/constraints.txt --prefer-binary \
-    --ignore-installed blinker \
-    deepface tf-keras && \
-    rm -rf /tmp/packages/ /tmp/constraints.txt
+    pip install --find-links=/tmp/packages/ --prefer-binary \
+    -r /tmp/requirements.txt && \
+    rm -rf /tmp/packages/ /tmp/requirements.txt
 
 # Create workspace directory
 WORKDIR /workspace

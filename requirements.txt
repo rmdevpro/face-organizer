@@ -1,0 +1,17 @@
+# Face Organizer - Minimal Requirements
+# For person-specific face clustering using InsightFace + FAISS
+
+# Core face processing
+insightface==0.7.3          # Face embeddings (ArcFace model)
+onnxruntime-gpu>=1.19.0     # GPU-accelerated model inference for InsightFace
+
+# Clustering and numerical operations
+faiss-cpu==1.9.0            # K-Means clustering (CPU fallback, GPU version via conda)
+numpy<2.0                   # Array operations (InsightFace requires <2.0)
+
+# Image processing
+opencv-python>=4.8.0        # Image operations (InsightFace dependency)
+Pillow>=10.0.0              # Image loading
+
+# Utilities
+tqdm>=4.66.0                # Progress bars
